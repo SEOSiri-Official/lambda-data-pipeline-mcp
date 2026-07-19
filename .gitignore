@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.db
+.pytest_cache/
+.vscode/
+lambda_data_pipeline_mcp.egg-info/
