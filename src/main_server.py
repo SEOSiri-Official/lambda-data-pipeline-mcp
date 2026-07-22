@@ -336,4 +336,4 @@ def sanitize_and_validate_payload(proposed_payload: str, active_profiles_csv: st
 if __name__ == "__main__":
     import time
     time.sleep(0.5)
-    mcp.run(transport='stdio')
+    mcp.run(transport='sse')
