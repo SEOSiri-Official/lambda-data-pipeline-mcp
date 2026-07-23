@@ -33,5 +33,3 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = ["src", "src.profiles"]
 
-[tool.vercel]
-entrypoint = "src.oauth_listener:app"
