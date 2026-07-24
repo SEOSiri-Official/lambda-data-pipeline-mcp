@@ -30,7 +30,7 @@ async def oauth_callback(code: str = Query(None), error: str = Query(None, alias
     if not code:
         raise HTTPException(status_code=400, detail="Missing authorization code parameter.")
 
-    # 1. Exchange temporary code for active tokens via HubSpot API
+    # 1. Exchange temporary code for active tokens via HubSpot API (with PKCE)
     token_url = "https://api.hubapi.com/oauth/v1/token"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     data = {
@@ -38,7 +38,8 @@ async def oauth_callback(code: str = Query(None), error: str = Query(None, alias
         "client_id": HUBSPOT_CLIENT_ID,
         "client_secret": HUBSPOT_CLIENT_SECRET,
         "redirect_uri": HUBSPOT_REDIRECT_URI,
-        "code": code
+        "code": code,
+        "code_verifier": "seosiri_mcp_pkce_verifier_2026_seosiri_data_pipeline_key_12345"  # PKCE Verifier
     }
     
     try:
