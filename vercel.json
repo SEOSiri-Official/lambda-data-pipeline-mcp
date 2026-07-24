@@ -8,8 +8,8 @@
   ],
   "routes": [
     {
-      "source": "/oauth/callback",
-      "destination": "/api/index.py"
+      "src": "/oauth/(.*)",
+      "dest": "/api/index.py"
     }
   ]
 }
