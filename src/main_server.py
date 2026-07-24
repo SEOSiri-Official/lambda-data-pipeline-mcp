@@ -333,6 +333,44 @@ def sanitize_and_validate_payload(proposed_payload: str, active_profiles_csv: st
         "payload": current_payload
     })
 
+    # src/main_server.py (Add this tool)
+from src.hubspot_broker import get_active_token
+
+@mcp.tool()
+def fetch_hubspot_contacts(limit: int = 10) -> str:
+    """
+    CRM Data Fetcher: Automatically retrieves active customer contacts 
+    from HubSpot using the secure, synchronized OAuth credentials in Supabase.
+    """
+    # 1. Fetch active token (automatically refreshed if expired)
+    token = get_active_token()
+    if not token:
+        return json.dumps({
+            "status": "UNAUTHORIZED",
+            "message": "No active or valid HubSpot integration found. Please authorize your app via the OAuth callback."
+        })
+
+    # 2. Query live contacts from HubSpot
+    url = f"https://api.hubapi.com/crm/v3/objects/contacts?limit={limit}"
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        if response.status_code == 200:
+            contacts_data = response.json()
+            return json.dumps({
+                "status": "SUCCESS",
+                "source": "HubSpot_Live_CRM",
+                "contacts": contacts_data.get("results", [])
+            })
+        return json.dumps({
+            "status": "FAILED",
+            "error_code": response.status_code,
+            "message": response.text
+        })
+    except Exception as e:
+        return json.dumps({"status": "EXCEPTION", "error": str(e)})
+
 if __name__ == "__main__":
     import time
     time.sleep(0.5)
