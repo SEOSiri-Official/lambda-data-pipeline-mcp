@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
-HUBSPOT_CLIENT_ID = "b2e60e83-2d8-41a6-b51d-318d8a339c49"
+HUBSPOT_CLIENT_ID = "b2e60e83-2de8-41a6-b51d-318d8a339c49"
 HUBSPOT_REDIRECT_URI = "https://hubappapi.seosiri.com/oauth/callback"
 HUBSPOT_CLIENT_SECRET = os.environ.get("HUBSPOT_CLIENT_SECRET")
 
