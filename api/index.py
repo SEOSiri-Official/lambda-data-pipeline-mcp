@@ -44,14 +44,14 @@ async def oauth_callback(code: str = Query(None), error: str = Query(None, alias
     try:
         token_res = requests.post(token_url, headers=headers, data=data, timeout=10)
         if token_res.status_code != 200:
-            logging.error(f"HubSpot Token Exchange Failed: {token_res.status_code} - {token_res.text}")
+            # THIS WILL PRINT HUBSPOT'S EXACT ERROR REASON DIRECTLY ON YOUR BROWSER SCREEN
             return f"""
             <html>
-                <body style="font-family: sans-serif; text-align: center; padding-top: 100px; background-color: #0f172a; color: #f8fafc;">
-                    <div style="max-width: 500px; margin: 0 auto; padding: 40px; border-radius: 8px; background-color: #1e293b; border: 1px solid #334155;">
-                        <h2 style="color: #dc2626; margin-bottom: 0.5em;">Token Exchange Failed</h2>
-                        <p style="color: #94a3b8; line-height: 1.5;">HubSpot returned status code {token_res.status_code}. Please verify your Client Secret in Vercel environment variables.</p>
-                    </div>
+                <body style="font-family: sans-serif; padding: 40px; background: #1e293b; color: #f8fafc;">
+                    <h2 style="color: #dc2626;">HubSpot 400 Error Details</h2>
+                    <p><strong>Redirect URI Sent:</strong> {HUBSPOT_REDIRECT_URI}</p>
+                    <p><strong>Raw HubSpot Response:</strong></p>
+                    <pre style="background: #0f172a; padding: 20px; border-radius: 6px; color: #f87171; overflow-x: auto;">{token_res.text}</pre>
                 </body>
             </html>
             """
