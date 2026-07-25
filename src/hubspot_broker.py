@@ -67,23 +67,42 @@ def get_active_token() -> str:
             new_refresh_token = new_creds.get("refresh_token")
             expires_in = new_creds.get("expires_in")
             
-            # Update Supabase with the fresh tokens
-            update_headers = {
-                "apikey": SUPABASE_ANON_KEY,
-                "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
-                "Content-Type": "application/json"
-            }
-            update_payload = {
-                "access_token": new_access_token,
-                "refresh_token": new_refresh_token,
-                "expires_in": expires_in
-            }
-            requests.post(endpoint, headers=update_headers, json=update_payload, timeout=10)
-            print("[Broker] Tokens refreshed and synchronized successfully.")
-            return new_access_token
-        else:
-            print(f"[Broker Error] HubSpot token refresh failed: {ref_res.text}")
-            return ""
-    except Exception as e:
-        print(f"[Broker Exception] Failed to refresh tokens: {e}")
-        return ""
+           # Update Supabase with the fresh tokens
+update_headers = {
+    "apikey": SUPABASE_ANON_KEY,
+    "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
+    "Content-Type": "application/json",
+    "Prefer": "resolution=merge-duplicates"
+}
+
+update_payload = {
+    "platform": "HUBSPOT",
+    "access_token": new_access_token,
+    "refresh_token": new_refresh_token,
+    "expires_in": expires_in
+}
+
+update_res = requests.post(
+    endpoint,
+    headers=update_headers,
+    json=update_payload,
+    timeout=10
+)
+
+if update_res.status_code in (200, 201):
+    print("[Broker] Tokens refreshed and synchronized successfully.")
+    return new_access_token
+else:
+    print(
+        f"[Broker Error] Failed to persist refreshed token: "
+        f"{update_res.status_code} - {update_res.text}"
+    )
+    return ""
+
+# If HubSpot refresh itself failed
+print(f"[Broker Error] HubSpot token refresh failed: {ref_res.text}")
+return ""
+
+except Exception as e:
+    print(f"[Broker Exception] Failed to refresh tokens: {e}")
+    return ""
