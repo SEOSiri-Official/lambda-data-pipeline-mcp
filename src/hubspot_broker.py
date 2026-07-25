@@ -3,6 +3,7 @@ import os
 import requests
 import json
 import logging
+from datetime import datetime, timezone
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
@@ -12,6 +13,14 @@ HUBSPOT_CLIENT_SECRET = os.environ.get("HUBSPOT_CLIENT_SECRET")
 # Format Supabase URL
 if SUPABASE_URL and not SUPABASE_URL.startswith("http"):
     SUPABASE_URL = f"https://{SUPABASE_URL}"
+
+
+def _utc_now_iso() -> str:
+    """Explicit UTC timestamp — DEFAULT NOW() on the column only fires on
+    INSERT, not on ON CONFLICT DO UPDATE merges, so every write here sets
+    updated_at explicitly instead of relying on the column default."""
+    return datetime.now(timezone.utc).isoformat()
+
 
 def get_active_token() -> str:
     """
@@ -76,7 +85,8 @@ def get_active_token() -> str:
                 "platform": "HUBSPOT",
                 "access_token": new_access_token,
                 "refresh_token": new_refresh_token,
-                "expires_in": expires_in
+                "expires_in": expires_in,
+                "updated_at": _utc_now_iso(),
             }
             update_res = requests.post(endpoint, headers=update_headers, json=update_payload, timeout=10)
 

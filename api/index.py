@@ -6,6 +6,7 @@ import secrets
 import base64
 import hashlib
 import requests
+from datetime import datetime, timezone
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 
@@ -42,6 +43,13 @@ def _supabase_headers(extra: dict = None) -> dict:
     if extra:
         headers.update(extra)
     return headers
+
+
+def _utc_now_iso() -> str:
+    """Explicit UTC timestamp — DEFAULT NOW() on the column only fires on
+    INSERT, not on ON CONFLICT DO UPDATE merges, so every write here sets
+    updated_at explicitly instead of relying on the column default."""
+    return datetime.now(timezone.utc).isoformat()
 
 
 @app.get("/oauth/install")
@@ -173,6 +181,7 @@ async def oauth_callback(
         "access_token": access_token,
         "refresh_token": refresh_token,
         "expires_in": expires_in,
+        "updated_at": _utc_now_iso(),
     }
 
     try:
