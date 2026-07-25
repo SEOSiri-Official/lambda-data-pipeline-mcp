@@ -27,12 +27,12 @@ def get_active_token() -> str:
         "apikey": SUPABASE_ANON_KEY,
         "Authorization": f"Bearer {SUPABASE_ANON_KEY}"
     }
-    
+
     try:
         response = requests.get(endpoint, headers=headers, timeout=10)
         if response.status_code != 200 or not response.json():
             raise ValueError("No active integration found in Supabase.")
-        
+
         creds = response.json()[0]
         access_token = creds.get("access_token")
         refresh_token = creds.get("refresh_token")
@@ -46,10 +46,9 @@ def get_active_token() -> str:
     test_res = requests.get(test_url, headers=test_headers, timeout=5)
 
     if test_res.status_code == 200:
-        # Token is still valid, return it immediately
         return access_token
 
-    # 3. If token is expired (Status 401), trigger an automatic OAuth refresh
+    # 3. If token is expired, trigger an automatic OAuth refresh
     print("[Broker] Token expired. Triggering automatic refresh...")
     refresh_url = "https://api.hubapi.com/oauth/v1/token"
     refresh_data = {
@@ -58,7 +57,7 @@ def get_active_token() -> str:
         "client_secret": HUBSPOT_CLIENT_SECRET,
         "refresh_token": refresh_token
     }
-    
+
     try:
         ref_res = requests.post(refresh_url, data=refresh_data, timeout=10)
         if ref_res.status_code == 200:
@@ -66,43 +65,30 @@ def get_active_token() -> str:
             new_access_token = new_creds.get("access_token")
             new_refresh_token = new_creds.get("refresh_token")
             expires_in = new_creds.get("expires_in")
-            
-           # Update Supabase with the fresh tokens
-update_headers = {
-    "apikey": SUPABASE_ANON_KEY,
-    "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
-    "Content-Type": "application/json",
-    "Prefer": "resolution=merge-duplicates"
-}
 
-update_payload = {
-    "platform": "HUBSPOT",
-    "access_token": new_access_token,
-    "refresh_token": new_refresh_token,
-    "expires_in": expires_in
-}
+            update_headers = {
+                "apikey": SUPABASE_ANON_KEY,
+                "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
+                "Content-Type": "application/json",
+                "Prefer": "resolution=merge-duplicates"
+            }
+            update_payload = {
+                "platform": "HUBSPOT",
+                "access_token": new_access_token,
+                "refresh_token": new_refresh_token,
+                "expires_in": expires_in
+            }
+            update_res = requests.post(endpoint, headers=update_headers, json=update_payload, timeout=10)
 
-update_res = requests.post(
-    endpoint,
-    headers=update_headers,
-    json=update_payload,
-    timeout=10
-)
-
-if update_res.status_code in (200, 201):
-    print("[Broker] Tokens refreshed and synchronized successfully.")
-    return new_access_token
-else:
-    print(
-        f"[Broker Error] Failed to persist refreshed token: "
-        f"{update_res.status_code} - {update_res.text}"
-    )
-    return ""
-
-# If HubSpot refresh itself failed
-print(f"[Broker Error] HubSpot token refresh failed: {ref_res.text}")
-return ""
-
-except Exception as e:
-    print(f"[Broker Exception] Failed to refresh tokens: {e}")
-    return ""
+            if update_res.status_code in (200, 201):
+                print("[Broker] Tokens refreshed and synchronized successfully.")
+                return new_access_token
+            else:
+                print(f"[Broker Error] Failed to persist refreshed token: {update_res.status_code} - {update_res.text}")
+                return ""
+        else:
+            print(f"[Broker Error] HubSpot token refresh failed: {ref_res.text}")
+            return ""
+    except Exception as e:
+        print(f"[Broker Exception] Failed to refresh tokens: {e}")
+        return ""
