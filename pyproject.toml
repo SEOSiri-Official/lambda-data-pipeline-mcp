@@ -24,7 +24,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://www.seosiri.com/2026/07/etl-pipeline-mcp.html"
+Homepage = "https://www.seosiri.com/2026/07/seosiri-mcp-servers.html"
 Repository = "https://github.com/SEOSiri-Official/lambda-data-pipeline-mcp.git"
 Sponsorship = "https://github.com/sponsors/SEOSiri-Official"
 
