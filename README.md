@@ -1,5 +1,8 @@
 # lambda-data-pipeline-mcp
 
+> 📖 **Official Architecture & Documentation:** [SEOSiri Technical Guide](https://www.seosiri.com/2026/07/etl-pipeline-mcp.html) | [Central MCP Directory](https://www.seosiri.com/2026/07/seosiri-mcp-servers.html)
+
+
 [![lambda-data-pipeline-mcp MCP server](https://glama.ai/mcp/servers/SEOSiri-Official/lambda-data-pipeline-mcp/badges/card.svg?v=2?v=2)](https://glama.ai/mcp/servers/SEOSiri-Official/lambda-data-pipeline-mcp)
 
 An open-source, stateless, and high-performance Model Context Protocol (MCP) server designed to handle high-volume Big Data Ingestion, Filtering, and Analytical Pipeline Routing using a decoupled Hot/Cold Lambda Storage Architecture.
