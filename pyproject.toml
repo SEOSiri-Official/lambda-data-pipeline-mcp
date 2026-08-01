@@ -1,37 +1,36 @@
 [project]
 name = "lambda-data-pipeline-mcp"
-version = "1.0.0"
-description = "A sovereign, universal API validation, big data ingestion, and multi-industry compliance security server using the Model Context Protocol."
+version = "1.0.3"
+description = "A sovereign, high-speed, local-first Big Data Ingestion, Filtering, and Analytical Pipeline Orchestrator over the Model Context Protocol."
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
     { name = "SEOSiri-Official", email = "info@seosiri.com" }
 ]
-license = { text = "MIT" }
+license = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Topic :: Security",
-    "Topic :: Scientific/Engineering :: Interface Engine"
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Security"
 ]
 dependencies = [
-    "mcp>=1.0.0",
-    "requests>=2.28.0",
-    "jsonschema>=4.17.0",
-    "fastapi>=0.110.0",
-    "uvicorn>=0.31.1"
+    "mcp[cli]>=1.2.0",
+    "requests==2.34.2",
+    "fastapi==0.110.0",
+    "uvicorn==0.31.1",
+    "pydantic==2.13.4",
+    "starlette==0.36.3"
 ]
 
 [project.urls]
 Homepage = "https://www.seosiri.com/2026/07/seosiri-mcp-servers.html"
+Documentation = "https://www.seosiri.com/2026/07/seosiri-mcp-servers.html"
 Repository = "https://github.com/SEOSiri-Official/lambda-data-pipeline-mcp.git"
-Sponsorship = "https://github.com/sponsors/SEOSiri-Official"
 
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=77.0.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["src", "src.profiles"]
-
+packages = ["src"]
