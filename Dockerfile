@@ -1,24 +1,22 @@
-FROM debian:trixie-slim
+FROM python:3.10-slim
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl git \
-    && curl -fsSL https://deb.nodesource.com/setup_26.x | bash - \
-    && apt-get install -y --no-install-recommends nodejs \
-    && npm install -g mcp-proxy@6.4.3 pnpm@10.14.0 \
-    && curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR="/usr/local/bin" sh \
-    && uv python install 3.13 --default --preview \
-    && ln -s $(uv python find) /usr/local/bin/python \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY . .
+# Install essential build packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV PATH="/app/node_modules/.bin:$PATH"
+# Install uv package manager
+RUN pip install --no-cache-dir uv
 
-RUN (uv pip install --system --break-system-packages -e .)
+# Copy project files
+COPY . /app/
 
-CMD ["mcp-proxy", "--", "uv", "run", "src/main_server.py"]
+# Install package in editable mode
+RUN uv pip install --system --break-system-packages -e .
+
+CMD ["python", "src/main_server.py"]
