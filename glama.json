@@ -2,5 +2,23 @@
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "maintainers": [
     "MOBILEPHONE"
-  ]
+  ],
+  "environmentVariables": {
+    "type": "object",
+    "properties": {
+      "SUPABASE_URL": {
+        "type": "string",
+        "description": "Supabase PostgreSQL REST API Endpoint URL",
+        "default": "https://uogsgqutemfbwohehlfl.supabase.co"
+      },
+      "SUPABASE_ANON_KEY": {
+        "type": "string",
+        "description": "Supabase Anon/Public API Key for token broker authentication"
+      }
+    },
+    "required": [
+      "SUPABASE_URL",
+      "SUPABASE_ANON_KEY"
+    ]
+  }
 }

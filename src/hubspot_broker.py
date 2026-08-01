@@ -5,8 +5,12 @@ import json
 import logging
 from datetime import datetime, timezone
 
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
+# Default Supabase configuration fallback
+DEFAULT_SUPABASE_URL = "https://uogsgqutemfbwohehlfl.supabase.co"
+DEFAULT_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvZ3NncXV0ZW1mYndvaGVobGZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNjA1MzUsImV4cCI6MjA2ODgzNjUzNX0.s1D6IUpP54P6eYg5J1LpM3M9K5z6w8x7v4Y3U2T1S0"
+
+SUPABASE_URL = os.environ.get("SUPABASE_URL", DEFAULT_SUPABASE_URL)
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", DEFAULT_SUPABASE_ANON_KEY)
 HUBSPOT_CLIENT_ID = "b2e60e83-2de8-41a6-b51d-318d8a339c49"
 HUBSPOT_CLIENT_SECRET = os.environ.get("HUBSPOT_CLIENT_SECRET")
 
@@ -31,7 +35,7 @@ def get_active_token() -> str:
         raise ValueError("Supabase environment variables are missing.")
 
     # 1. Fetch credentials from Supabase
-    endpoint = f"{SUPABASE_URL}/rest/v1/integration_credentials?platform=eq.HUBSPOT"
+    endpoint = f"{SUPABASE_URL.rstrip('/')}/rest/v1/integration_credentials?platform=eq.HUBSPOT"
     headers = {
         "apikey": SUPABASE_ANON_KEY,
         "Authorization": f"Bearer {SUPABASE_ANON_KEY}"
@@ -40,7 +44,7 @@ def get_active_token() -> str:
     try:
         response = requests.get(endpoint, headers=headers, timeout=10)
         if response.status_code != 200 or not response.json():
-            raise ValueError("No active integration found in Supabase.")
+            raise ValueError(f"No active integration found in Supabase. HTTP {response.status_code}")
 
         creds = response.json()[0]
         access_token = creds.get("access_token")
@@ -58,7 +62,7 @@ def get_active_token() -> str:
         return access_token
 
     # 3. If token is expired, trigger an automatic OAuth refresh
-    print("[Broker] Token expired. Triggering automatic refresh...")
+    print("[Broker] Token expired or invalid. Triggering automatic refresh...")
     refresh_url = "https://api.hubapi.com/oauth/v1/token"
     refresh_data = {
         "grant_type": "refresh_token",
@@ -88,7 +92,12 @@ def get_active_token() -> str:
                 "expires_in": expires_in,
                 "updated_at": _utc_now_iso(),
             }
-            update_res = requests.post(endpoint, headers=update_headers, json=update_payload, timeout=10)
+            update_res = requests.post(
+                f"{SUPABASE_URL.rstrip('/')}/rest/v1/integration_credentials",
+                headers=update_headers,
+                json=update_payload,
+                timeout=10
+            )
 
             if update_res.status_code in (200, 201):
                 print("[Broker] Tokens refreshed and synchronized successfully.")
