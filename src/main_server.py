@@ -11,7 +11,13 @@ import hashlib
 import sqlite3
 import requests
 from datetime import datetime, timezone
-from mcp.server.fastmcp import FastMCP
+try:
+    from mcp.server.fastmcp import FastMCP
+except ImportError:
+    try:
+        from fastmcp import FastMCP
+    except ImportError:
+        from mcp.server import FastMCP
 from src.core_validator import scan_universal_security
 from src.profiles.hipaa import enforce_hipaa_compliance
 from src.profiles.pci_dss import enforce_pci_compliance
