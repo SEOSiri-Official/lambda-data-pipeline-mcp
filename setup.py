@@ -1,5 +1,15 @@
 
 # =========================================================================
+# PILLAR 2: STRICT PYDANTIC INPUT VALIDATION CONTRACTS
+# =========================================================================
+from pydantic import BaseModel, Field
+
+class ValidatedPipelineRequest(BaseModel):
+    stream_id: str = Field(default="STREAM-01", min_length=1)
+    batch_size: int = Field(default=100, ge=1, le=5000)
+
+
+# =========================================================================
 # PILLAR 3: SECURITY & GOVERNANCE (HMAC / PII SANITIZATION)
 # =========================================================================
 import hmac, hashlib
