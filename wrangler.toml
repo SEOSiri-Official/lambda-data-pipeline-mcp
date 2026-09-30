@@ -1,8 +1,0 @@
-name = "lambda-data-pipeline-mcp"
-main = "worker.js"
-compatibility_date = "2026-08-25"
-workers_dev = true
-
-routes = [
-  { pattern = "hubappapi.seosiri.com", custom_domain = true }
-]
